@@ -1,3 +1,4 @@
+import app/web.{Context}
 import dot_env as dot
 import dot_env/env
 import gleam/erlang/process
@@ -13,6 +14,8 @@ pub fn main() {
 
   let assert Ok(secret_key_base) = env.get("SECRET_KEY_BASE")
 
+  let ctx = Context(static_directory: get_static_directory(), items: [])
+
   let assert Ok(_) =
   // arg1 is the request handler. arg2 is the secret key that we will use to sign cookies and other sensitive data.
     wisp.mist_handler(fn(_) { todo }, secret_key_base)
@@ -22,4 +25,9 @@ pub fn main() {
 
   io.println("Hello from app!")
   process.sleep_forever() // suspend the main process to keep the web server running
+}
+
+fn get_static_directory() {
+  let assert Ok(priv_directory) = wisp.priv_directory("app")
+  priv_directory <> "/static"
 }
